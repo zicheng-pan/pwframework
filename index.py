@@ -11,7 +11,7 @@ def index():
 def test_js():
    return '<script src="/static/test.js"></script>'
 
-#
+#use view to add rule
 
 class Index(BaseView):
     def get(self, request):
