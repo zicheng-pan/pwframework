@@ -1,6 +1,8 @@
 # coding: utf8
 from xin import SYLFK
 from xin.view import BaseView,Controller
+from xin import simple_template
+
 app = SYLFK()
 @app.route('/index', methods=['GET'])
 def index():
@@ -15,8 +17,7 @@ def test_js():
 
 class Index(BaseView):
     def get(self, request):
-        return '你好，实验楼'
-
+        return simple_template("index.html", user="shiyanlou_001", message="实验楼，你好")
 
 class Test(Index):
     def post(self, request):

@@ -4,7 +4,7 @@ from werkzeug.wrappers import Response
 from xin.wsgi_adapter import wsgi_app
 import xin.exceptions as exceptions
 import os
-
+from xin.template_engine import replace_template
 
 # 处理函数数据结构
 class ExecFunc:
@@ -36,7 +36,7 @@ def parse_static_key(filename):
 
 class SYLFK(object):
 
-    def __init__(self, static_folder='static'):
+    def __init__(self, static_folder='static',template_folder="template"):
         self.host = '127.0.0.1'  # 默认主机
         self.port = 8080  # 默认端口
         self.url_map = {} # 存放 URL 与 Endpoint 的映射
@@ -45,6 +45,10 @@ class SYLFK(object):
         self.static_folder = static_folder # 静态资源本地存放路径，默认放在应
         # route
         self.route = Route(self)
+
+        self.template_folder = os.path.sep.join(("xin",template_folder)) # 模版文件本地存放路径，默认放在应用所在目录的 template 目录下
+        SYLFK.template_folder = self.template_folder # 为类的 template_folder 也初始化，供上面的置换模版引擎调用
+
 
     # 静态资源调路由
     def dispatch_static(self, static_path):
@@ -200,6 +204,9 @@ class SYLFK(object):
             # 绑定 URL 与 视图对象，最后的节点名格式为 `控制器名` + "." + 定义的节点名
             self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
 
+# 模版引擎接口
+def simple_template(path, **options):
+    return replace_template(SYLFK, path, **options)
 
 # 路由装饰器
 class Route:
