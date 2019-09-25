@@ -1,6 +1,6 @@
-from flask.view.BasicView import BaseView
-from flask.view.Controller import Controller
-from flask.wsgi_adapter.wsgi_main import FlaskMain as Flask
+from flaskproject.view.BasicView import BaseView
+from flaskproject.view.Controller import Controller
+from flaskproject.wsgi_adapter.wsgi_main import FlaskMain as Flask
 
 app = Flask()
 

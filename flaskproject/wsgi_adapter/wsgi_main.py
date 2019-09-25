@@ -1,12 +1,12 @@
 # encoding: utf-8
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Response
-from flask.wsgi_adapter import wsgi_app
-import flask.exceptions as exceptions
-from flask.helper import parse_static_key
+from flaskproject.wsgi_adapter import wsgi_app
+import flaskproject.exceptions as exceptions
+from flaskproject.helper import parse_static_key
 import os
 
-from flask.wsgi_adapter.root import Route
+from flaskproject.wsgi_adapter.root import Route
 
 ERROR_MAP = {
     '401': Response('<h1>401 Unknown or unsupported method</h1>', content_type='text/html; charset=UTF-8', status=401),

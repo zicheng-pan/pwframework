@@ -41,7 +41,7 @@ children = {'name': '__init__.py', 'children': None, 'type': 'file'}
 
 # build folder structure by object
 dir_map = [{
-    'name': 'flask',  # project name
+    'name': 'flaskproject',  # project name
     'children': [
         {
             'name': directory_name,

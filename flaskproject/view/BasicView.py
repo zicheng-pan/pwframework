@@ -1,5 +1,5 @@
 # encoding: utf-8
-from flask.view.View import View
+from flaskproject.view.View import View
 
 
 class BaseView(View):
