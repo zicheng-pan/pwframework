@@ -169,3 +169,18 @@ class FlaskMain:
 
         # 添加节点与请求处理函数映射
         self.function_map[endpoint] = ExecFunc(func, func_type, **options)
+
+    # create view related
+    def bind_view(self, url, view_class, endpoint):
+        self.add_url_rule(url, func=view_class.get_func(endpoint), func_type='view')
+
+    # 控制器加载
+    def load_controller(self, controller):
+
+        # 获取控制器名字
+        name = controller.__name__()
+
+        # 遍历控制器的 `url_map` 成员
+        for rule in controller.url_map:
+            # 绑定 URL 与 视图对象，最后的节点名格式为 `控制器名` + "." + 定义的节点名
+            self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
