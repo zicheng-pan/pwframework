@@ -27,12 +27,12 @@ class Test(Index):
 
 syl_url_map = [
     {
-        'url': '/testA',
+        'url': '/index/index',
         'view': Index,
         'endpoint': 'index'
     },
     {
-        'url': '/testB',
+        'url': '/index/test',
         'view': Test,
         'endpoint': 'test'
     }
