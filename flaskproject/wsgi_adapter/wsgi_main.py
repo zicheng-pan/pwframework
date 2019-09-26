@@ -1,6 +1,8 @@
 # encoding: utf-8
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Response
+
+from flaskproject.template_engine import replace_template
 from flaskproject.wsgi_adapter import wsgi_app
 import flaskproject.exceptions as exceptions
 from flaskproject.helper import parse_static_key
@@ -32,7 +34,7 @@ class ExecFunc:
 
 class FlaskMain:
 
-    def __init__(self, static_folder='static'):
+    def __init__(self, static_folder='static', template_folder='template'):
         self.host = '127.0.0.1'  # default host
         self.port = 8086  # default port
         self.url_map = {}  # 存放 URL 与 Endpoint 的映射
@@ -40,6 +42,8 @@ class FlaskMain:
         self.function_map = {}  # 存放 Endpoint 与请求处理函数的映射
         self.static_folder = static_folder  # 静态资源本地存放路径，默认放在应
         self.route = Route(self)  # 路由装饰器
+        self.template_folder = template_folder  # 模版文件本地存放路径，默认放在应用所在目录的 template 目录下
+        FlaskMain.template_folder = self.template_folder  # 为类的 template_folder 也初始化，供上面的置换模版引擎调用
 
     # 静态资源调路由
     def dispatch_static(self, static_path):
@@ -184,3 +188,7 @@ class FlaskMain:
         for rule in controller.url_map:
             # 绑定 URL 与 视图对象，最后的节点名格式为 `控制器名` + "." + 定义的节点名
             self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
+
+# 模版引擎接口
+def simple_template(path, **options):
+    return replace_template(FlaskMain, path, **options)

@@ -1,6 +1,7 @@
+# encoding: utf-8
 from flaskproject.view.BasicView import BaseView
 from flaskproject.view.Controller import Controller
-from flaskproject.wsgi_adapter.wsgi_main import FlaskMain as Flask
+from flaskproject.wsgi_adapter.wsgi_main import FlaskMain as Flask, simple_template
 
 app = Flask()
 
@@ -17,7 +18,7 @@ def test_js():
 
 class Index(BaseView):
     def get(self, request):
-        return '你好'
+        return simple_template("index.html", user="testuser", message="testMEssage")
 
 
 class Test(Index):
