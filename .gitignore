@@ -13,3 +13,5 @@
 log/
 target/
 build/
+/.idea/*
+*.pyc
