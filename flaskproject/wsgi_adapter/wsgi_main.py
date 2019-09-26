@@ -2,6 +2,7 @@
 from werkzeug.serving import run_simple
 from werkzeug.wrappers import Response
 
+from flaskproject.session import create_session_id
 from flaskproject.template_engine import replace_template
 from flaskproject.wsgi_adapter import wsgi_app
 import flaskproject.exceptions as exceptions
@@ -66,6 +67,20 @@ class FlaskMain:
             return ERROR_MAP['404']
 
     def dispatch_request(self, request):
+        # 从请求中取出 Cookie
+        cookies = request.cookies
+        # 如果 session_id 这个键不在 cookies 中，则通知客户端设置 Cookie
+        if 'session_id' not in cookies:
+            headers = {
+                'Set-Cookie': 'session_id=%s' % create_session_id(),
+            # 定义 Set-Cookie属性，通知客户端记录 Cookie，create_session_id 是生成一个无规律唯一字符串的方法
+                'Server': 'Flask Framework'  # 定义响应报头的 Server 属性
+            }
+        else:
+            # 定义响应报头的 Server 属性
+            headers = {
+                'Server': 'Flask Framework'
+            }
         # 去掉 URL 中 域名部分，也就从 http://xxx.com/path/file?xx=xx 中提取 path/file 这部分
         url = "/" + "/".join(request.url.split("/")[3:]).split("?")[0]
 
@@ -188,6 +203,7 @@ class FlaskMain:
         for rule in controller.url_map:
             # 绑定 URL 与 视图对象，最后的节点名格式为 `控制器名` + "." + 定义的节点名
             self.bind_view(rule['url'], rule['view'], name + '.' + rule['endpoint'])
+
 
 # 模版引擎接口
 def simple_template(path, **options):
