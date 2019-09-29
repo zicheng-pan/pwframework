@@ -3,6 +3,7 @@ from werkzeug.serving import run_simple
 from werkzeug.wrappers import Response
 
 from flaskproject.session import create_session_id
+from flaskproject.session.Session import session
 from flaskproject.template_engine import replace_template
 from flaskproject.wsgi_adapter import wsgi_app
 import flaskproject.exceptions as exceptions
@@ -35,7 +36,7 @@ class ExecFunc:
 
 class FlaskMain:
 
-    def __init__(self, static_folder='static', template_folder='template'):
+    def __init__(self, static_folder='static', template_folder='template', session_path=".session"):
         self.host = '127.0.0.1'  # default host
         self.port = 8086  # default port
         self.url_map = {}  # 存放 URL 与 Endpoint 的映射
@@ -45,6 +46,7 @@ class FlaskMain:
         self.route = Route(self)  # 路由装饰器
         self.template_folder = template_folder  # 模版文件本地存放路径，默认放在应用所在目录的 template 目录下
         FlaskMain.template_folder = self.template_folder  # 为类的 template_folder 也初始化，供上面的置换模版引擎调用
+        self.session_path = session_path  # 会话记录默认存放在应用同目录下的 .session 文件夹中
 
     # 静态资源调路由
     def dispatch_static(self, static_path):
@@ -73,14 +75,13 @@ class FlaskMain:
         if 'session_id' not in cookies:
             headers = {
                 'Set-Cookie': 'session_id=%s' % create_session_id(),
-            # 定义 Set-Cookie属性，通知客户端记录 Cookie，create_session_id 是生成一个无规律唯一字符串的方法
+                # 定义 Set-Cookie属性，通知客户端记录 Cookie，create_session_id 是生成一个无规律唯一字符串的方法
                 'Server': 'Flask Framework'  # 定义响应报头的 Server 属性
             }
         else:
             # 定义响应报头的 Server 属性
-            headers = {
-                'Server': 'Flask Framework'
-            }
+            headers = {'Server': 'Flask 0.1'}
+            
         # 去掉 URL 中 域名部分，也就从 http://xxx.com/path/file?xx=xx 中提取 path/file 这部分
         url = "/" + "/".join(request.url.split("/")[3:]).split("?")[0]
 
@@ -93,8 +94,6 @@ class FlaskMain:
             # 若不以 static 为首，则从 URL 与 节点的映射表中获取节点
             endpoint = self.url_map.get(url, None)
         # 定义响应报头，Server 参数的值表示运行的服务名，通常有 IIS， Apache，Tomcat，Nginx等，这里自定义为 Flask Web 0.1
-
-        headers = {'Server': 'Flask 0.1'}
 
         # 如果节点为空 返回 404
         if endpoint is None:
@@ -162,6 +161,17 @@ class FlaskMain:
             self.port = port
         # 映射静态资源处理函数，所有静态资源处理函数都是静态资源路由
         self.function_map['static'] = ExecFunc(func=self.dispatch_static, func_type='static')
+
+        # 如果会话记录存放目录不存在，则创建它
+        if not os.path.exists(self.session_path):
+            os.mkdir(self.session_path)
+
+        # 设置会话记录存放目录
+        session.set_storage_path(self.session_path)
+
+        # 加载本地缓存的 session 记录
+        session.load_local_session()
+
         # 把框架本身也就是应用本身和其它几个配置参数传给 werkzeug 的 run_simple
         run_simple(hostname=self.host, port=self.port, application=self, **options)
 

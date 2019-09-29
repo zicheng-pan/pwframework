@@ -49,7 +49,7 @@ class Session:
         session_id = get_session_id(request)
 
         # 如果这个 Session ID 已存在与映射表中，则直接为其添加新的数据键值对，如果不存在，则先初始化为空的字典，再添加数据键值对
-        if session in self.__session_map__:
+        if session_id in self.__session_map__:
             # 直接对当前会话添加数据
             self.__session_map__[get_session_id(request)][item] = value
         else:
@@ -71,6 +71,38 @@ class Session:
         if item in current_session:
             current_session.pop(item, value)
             self.storage(session_id)
+
+    # 加载本地会话记录
+    def load_local_session(self):
+
+        # 如果已设置 Session 会话存放路径，则开始从本地加载缓存
+        if self.__storage_path__ is not None:
+
+            # 从本地存放目录获取所有 Session 会话记录文件列表，文件名其实就是 Session ID
+            session_path_list = os.listdir(self.__storage_path__)
+
+            # 遍历会话记录文件列表
+            for session_id in session_path_list:
+                # 构造会话记录文件目录
+                path = os.path.join(self.__storage_path__, session_id)
+
+                # 读取文件中的内容
+                with open(path, 'rb') as f:
+                    content = f.read()
+
+                # 把文件内容进行 base64 解码
+                content = base64.decodebytes(content)
+
+                # 把 Session ID 于对应的会话内容绑定添加到会话映射表中
+                self.__session_map__[session_id] = json.loads(content.decode())
+
+    # 获取当前会话记录
+    def map(self, request):
+        return self.__session_map__.get(get_session_id(request), {})
+
+    # 获取当前会话的某个项
+    def get(self, request, item):
+        return self.__session_map__.get(get_session_id(request), {}).get(item, None)
 
 
 # 单例全局对象
