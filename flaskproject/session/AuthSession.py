@@ -1,6 +1,7 @@
+# encoding: utf-8
 class AuthSession:
 
-    # Session Ğ£Ñé×°ÊÎÆ÷
+    # Session æ ¡éªŒè£…é¥°å™¨
     @classmethod
     def auth_session(cls, f, *args, **options):
 
@@ -8,12 +9,12 @@ class AuthSession:
             return f(obj, request) if cls.auth_logic(request, *args, **options) else cls.auth_fail_callback(request, *args, **options)
         return decorator
 
-    # ÑéÖ¤Âß¼­µÄ½Ó¿Ú£¬·µ»ØÒ»¸ö²¼¶ûÖµ
+    # éªŒè¯é€»è¾‘çš„æ¥å£ï¼Œè¿”å›ä¸€ä¸ªå¸ƒå°”å€¼
     @staticmethod
     def auth_logic(request, *args, **options):
         raise NotImplementedError
 
-    # ÑéÖ¤Ê§°ÜµÄ»Øµ÷½Ó¿Ú
+    # éªŒè¯å¤±è´¥çš„å›è°ƒæ¥å£
     @staticmethod
     def auth_fail_callback(request, *args, **options):
         raise NotImplementedError

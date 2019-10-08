@@ -3,6 +3,7 @@
 from flaskproject.session.AuthSession import AuthSession
 from flaskproject.session.Session import session
 from flaskproject.view.BasicView import BaseView
+from flaskproject.wsgi_adapter.wsgi_main import redirect
 
 
 class AuthLogin(AuthSession):
@@ -10,8 +11,8 @@ class AuthLogin(AuthSession):
     # 如果没有验证通过，则返回一个链接点击到登录页面
     @staticmethod
     def auth_fail_callback(request, *args, **options):
-        return '<a href="/login">登录</a>'
-
+        # return '<a href="/login">登录</a>'
+        return redirect("/login")
     # 验证逻辑，如果 user 这个键不在会话当中，则验证失败，反之则成功
     @staticmethod
     def auth_logic(request, *args, **options):

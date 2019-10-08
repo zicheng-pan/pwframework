@@ -3,7 +3,7 @@ from flaskproject.session.AuthLogin import SessionView
 from flaskproject.session.Session import session
 from flaskproject.view.BasicView import BaseView
 from flaskproject.view.Controller import Controller
-from flaskproject.wsgi_adapter.wsgi_main import FlaskMain as Flask, simple_template
+from flaskproject.wsgi_adapter.wsgi_main import FlaskMain as Flask, simple_template, redirect, render_json, render_file
 
 app = Flask()
 
@@ -31,7 +31,8 @@ class Login(BaseView):
         session.push(request, 'user', user)
 
         # 返回登录成功提示和首页链接
-        return '登录成功，<a href="/">返回</a>'
+        # return '登录成功，<a href="/">返回</a>'
+        return redirect("/")
 
 
 # 登出视图
@@ -41,7 +42,24 @@ class Logout(SessionView):
         session.pop(request, 'user')
 
         # 返回登出成功提示和首页链接
-        return '登出成功, <a href="/">返回</a>'
+        # return '登出成功, <a href="/">返回</a>'
+        return redirect("/")
+
+
+class API(BaseView):
+    def get(self, request):
+        data = {
+            'name': 'shiyanlou_001',
+            'company': '实验楼',
+            'department': '课程部'
+        }
+
+        return render_json(data)
+
+
+class Download(BaseView):
+    def get(self, request):
+        return render_file("main.py")
 
 
 syl_url_map = [
@@ -59,6 +77,16 @@ syl_url_map = [
         'url': '/logout',
         'view': Logout,
         'endpoint': 'logout'
+    },
+    {
+        'url': '/api',
+        'view': API,
+        'endpoint': 'api'
+    },
+    {
+        'url': '/download',
+        'view': Download,
+        'endpoint': 'download'
     }
 ]
 
@@ -67,4 +95,4 @@ app = Flask()
 index_controller = Controller('index', syl_url_map)
 app.load_controller(index_controller)
 
-app.run()
+app.run("0.0.0.0", 8080)
